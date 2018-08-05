@@ -36,7 +36,7 @@ namespace kerbal_impact
 
         protected bool actuallyGenerate()
         {
-            ImpactMonitor.Log("Trying to generate an impact contract");
+            //ImpactMonitor.Log("Trying to generate an impact contract");
             IEnumerable<CelestialBody> bodies = Contract.GetBodies_Reached(false, false);
             
             bodies = bodies.Where(body => !body.atmosphere);
@@ -50,7 +50,7 @@ namespace kerbal_impact
             if (contractIndex < 0) contractIndex = ~contractIndex;
             //ImpactMonitor.Log("pickedindex=" + contractIndex);
             pickedContract = contracts[contractIndex];
-            ImpactMonitor.Log("picked one "+pickedContract);
+           // ImpactMonitor.Log("picked one "+pickedContract);
 
             SetExpiry();
             SetScience(1.5f, pickedContract.body);
@@ -59,7 +59,7 @@ namespace kerbal_impact
             SetFunds(20000,80000,10000,pickedContract.body);
 
             generateParameters();
-            ImpactMonitor.Log("Generated parameters");
+            //ImpactMonitor.Log("Generated parameters");
             
             return true;
         }
@@ -384,14 +384,14 @@ namespace kerbal_impact
 
                 //ImpactMonitor.Log("posible body="+body.theName); 
                 // Moved check for body to prevent missing key exception in next line
-                if (!biomeDifficulties.ContainsKey(body)) continue;
-                Dictionary<string, int> biomes = biomeDifficulties[body];
 
                 int stars = starRatings[prestige];
                 //ImpactMonitor.Log("Looking for contracs with stars" + stars);
                 if (useBiomes)
                 {
-                    
+                    if (!biomeDifficulties.ContainsKey(body)) continue;
+                    Dictionary<string, int> biomes = biomeDifficulties[body];
+
                     IEnumerable<KeyValuePair<String, int>> b = biomes.Where(bd => (int)(bd.Value / 3.4) == stars - 1);
                     foreach (KeyValuePair<String, int> biomeVal in b)
                     {
