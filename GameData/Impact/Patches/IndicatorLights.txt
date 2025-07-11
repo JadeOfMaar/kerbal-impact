@@ -1,0 +1,22 @@
+@PART[sci-impact-seismometer]:NEEDS[IndicatorLights]
+{
+	MODULE
+	{
+		name = ModuleControllableEmissive
+		target = B2
+		emissiveName = indicator
+	}
+	MODULE
+	{
+		name = ModuleScienceDataIndicator
+		emissiveName = indicator
+		dataColor = $HighScience
+		partialDataColor = $MediumScience
+		lowDataColor = $LowScience
+		emptyColor = $Off
+	}
+	MODULE
+	{
+		name = ModuleScienceAvailabilityIndicator
+	}
+}
