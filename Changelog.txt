@@ -1,0 +1,64 @@
+Changelog
+
+1.9.0 (unreleased)
+	Adoption by Linuxurugamer
+	Removed MiniAVC.dll
+	Updated for 1.12.x
+
+1.8.0
+	Rebuild for 1.8
+
+1.6.4
+	Fix spectrometer contracts for outer bodies
+
+1.6.3.2
+	Remove contract generation spam
+
+1.6.3.1
+	fix directory structure
+
+1.6.3.0
+	Compatible with ksp 1.4
+
+1.6.2.2
+	Another attempt to fix ckan issues I do this every time
+	
+1.6.2
+	Increment internal version file for CKAN
+
+1.6.1
+	Allow for nationalization of Impact
+
+1.6.0
+	Support for the 1.3 release
+
+1.5.1
+	Fix the bug that was preventing impact within physics range of the instruments from registering
+
+1.5.0
+	Release for KSP 1.2
+
+1.4.3
+	Include the parent body in the description of asteroid orbiting contracts
+
+1.4.2
+	Fix spectometer transmitting science and aslo a bug where an impact on any body could satisfy the spectrometer contracts
+
+1.4.1
+	Impact now supports KSP 1.1
+
+1.3.0
+	Thanks to another contribution by Kerbas-Ad-Astra Impact is now compatible with 1.0.5
+
+1.2.0
+	Add asteroid tracking on contract generation and acceptance
+	It also adds the MiniAVC plugin to help keep the plugin up to date
+
+1.1.0
+	To celbrate asteroid day Impact! now allows you to collect science my colliding with asteroids
+
+1.0.0
+	Crash for fun and profit
+
+0.3.0
+	First release made available publicly
