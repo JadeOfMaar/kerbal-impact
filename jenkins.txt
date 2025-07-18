@@ -31,7 +31,7 @@
 1:Impact, Impact.version
 
 # 2:PROJNAME, PROJFILE, VERSIONFILE, PLUGINSFOLDER
-2:kerbal-impact,Impact/kerbal-impact.csproj,Impact.version,GameData/Impact/Plugins
+2:kerbal-impact,kerbal-impact/kerbal-impact.csproj,Impact.version,GameData/Impact/Plugins
 
 # 3:SOURCEFILE, DESTDIR
 3:Impact.version,GameData/Impact
