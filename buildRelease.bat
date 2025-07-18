@@ -1,6 +1,6 @@
 
 @echo off
-
+exit
 rem Put the following text into the Post-build event command line:
 rem without the "rem":
 

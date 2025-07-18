@@ -1,14 +1,16 @@
 ﻿using KSP.Localization;
 using KSP.UI.Screens.Flight.Dialogs;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace kerbal_impact
 {
-    class Spectrometer :PartModule, IScienceDataContainer
+    class Spectrometer : PartModule, IScienceDataContainer
     {
+        [KSPField(guiActive = true, guiActiveEditor = true, guiName = "Spectrometer Status", guiUnits = "", isPersistant = true)]
+        public string statusText = "   No data";
+
+
         protected ImpactScienceData result;
         //TODO I think this should be a list
 
@@ -20,7 +22,7 @@ namespace kerbal_impact
             {
                 ConfigNode storedDataNode = node.GetNode("ScienceData");
                 ImpactScienceData data = new ImpactScienceData(storedDataNode);
-                result=data;
+                result = data;
             }
         }
 
@@ -40,7 +42,7 @@ namespace kerbal_impact
                 data.SaveImpact(storedDataNode);
             }
         }
-        
+
 
         internal static void NewResult(ConfigNode node, ImpactScienceData newData)
         {
@@ -60,27 +62,36 @@ namespace kerbal_impact
 
         public override void OnUpdate()
         {
-            Events["reviewEvent"].active = result != null;
-
+            if (result != null)
+            {
+                Events["reviewEvent"].active = true;
+                statusText = "   Data recorded";
+            }
         }
 
-		public void ReturnData(ScienceData data)
-		{
-			if (data != null) {
-				if (result == null) {
-					result = data as ImpactScienceData;
-				} else if(data.dataAmount > result.dataAmount) {
-					result = data as ImpactScienceData;
-				}
-			}
 
-			return;
-		}
+        public void ReturnData(ScienceData data)
+        {
+            if (data != null)
+            {
+
+                if (result == null)
+                {
+                    result = data as ImpactScienceData;
+                }
+                else if (data.dataAmount > result.dataAmount)
+                {
+                    result = data as ImpactScienceData;
+                }
+            }
+
+            return;
+        }
 
         internal void addExperiment(ImpactScienceData newData)
         {
             //only replace if it is better than any existing results
-            if (result==null || newData.dataAmount > result.dataAmount)
+            if (result == null || newData.dataAmount > result.dataAmount)
             {
                 ImpactMonitor.Log("Trying to save impact");
                 result = newData;
@@ -116,16 +127,16 @@ namespace kerbal_impact
         public ScienceData[] GetData()
         {
             if (result != null)
-				return new ImpactScienceData[]{result};
-			else
-                return new ImpactScienceData[]{};
+                return new ImpactScienceData[] { result };
+            else
+                return new ImpactScienceData[] { };
         }
 
         public ImpactScienceData[] GetImpactData()
         {
             if (result != null)
-				return new ImpactScienceData[]{result};
-			else
+                return new ImpactScienceData[] { result };
+            else
                 return new ImpactScienceData[] { };
         }
 
@@ -143,7 +154,7 @@ namespace kerbal_impact
         {
             expDialog = null;
             List<IScienceDataTransmitter> tranList = vessel.FindPartModulesImplementing<IScienceDataTransmitter>();
-            if (tranList.Count > 0 && result!=null)
+            if (tranList.Count > 0 && result != null)
             {
                 List<ScienceData> list2 = new List<ScienceData>();
                 list2.Add(result);

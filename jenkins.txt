@@ -31,12 +31,13 @@
 1:KerbalHotSeat, KerbalHotSeat.version
 
 # 2:PROJNAME, PROJFILE, VERSIONFILE, PLUGINSFOLDER
-2:KerbalHotSeat,KerbalHotSeat/KerbalHotSeat.csproj,KerbalHotSeat.version,GameData/KerbalHotSeat/Plugins
+2:kerbal-impact,Impact/kerbal-impact.csproj,Impact.version,GameData/Impact/Plugins
 
 # 3:SOURCEFILE, DESTDIR
-3:KerbalHotSeat.version,GameData/KerbalHotSeat
-#3:LICENSE.md,GameData/KerbalHotSeat
-#3:README.md,GameData/KerbalHotSeat
+3:Impact.version,GameData/Impact
+3:Changelog.cfg,GameData/Impact
+3:LICENSE,GameData/Impact
+3:README.md,GameData/Impact
 
 # 4:SOURCDIR, DESTDIR
 #4:Textures,GameData/ManeuverQueue/Textures
