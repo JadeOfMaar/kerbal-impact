@@ -4,6 +4,13 @@ Changelog
 	Adoption by Linuxurugamer
 	Removed MiniAVC.dll
 	Updated for 1.12.x
+	Thanks to forum/github user @JadeOfMaar for this:
+		Deprecated old parts
+		Created 2 new parts to replace the old parts
+	Added status text for the Seismometer and Spectormeter
+	Added stock seismicScan experiment to the Seismometer
+	Updated description of the Spectrometer to indicate it only works in orbit
+	Updated README.md
 
 1.8.0
 	Rebuild for 1.8

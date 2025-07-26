@@ -1,12 +1,8 @@
-﻿using System;
+﻿using Contracts;
+using KSP.Localization;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using UnityEngine;
-using Contracts;
-using KSP;
-using KSPAchievements;
-using KSP.Localization;
 
 namespace kerbal_impact
 {
@@ -14,9 +10,9 @@ namespace kerbal_impact
     class ImpactContract : Contract
     {
         const String valuesNode = "ContractValues";
-        
+
         // Linuxgurugamer reformatted for readability
-        protected static Dictionary<ContractPrestige, int> starRatings = new Dictionary<ContractPrestige, int> 
+        protected static Dictionary<ContractPrestige, int> starRatings = new Dictionary<ContractPrestige, int>
         {
             { ContractPrestige.Trivial, 1 },
             { ContractPrestige.Significant, 2},
@@ -27,7 +23,7 @@ namespace kerbal_impact
         protected readonly System.Random random = new System.Random();
 
         public int randId = new System.Random().Next();
-        
+
 
         protected override bool Generate()
         {
@@ -38,29 +34,29 @@ namespace kerbal_impact
         {
             ImpactMonitor.Log("Trying to generate an impact contract");
             IEnumerable<CelestialBody> bodies = Contract.GetBodies_Reached(false, false);
-            
+
             bodies = bodies.Where(body => !body.atmosphere);
             //generate a weighted list of possible contracts (different bodsies and biomes where appropriate)
             List<PossibleContract> contracts = pickContracts(bodies);
             if (contracts.Count == 0) return false;
             double totalProb = contracts.Last().probability;
-            double picked = random.NextDouble()*totalProb;
+            double picked = random.NextDouble() * totalProb;
             IComparer<PossibleContract> comp = new PossibleContract.ProbComparer();
             int contractIndex = contracts.BinarySearch(new PossibleContract(picked, null, 0), comp);
             if (contractIndex < 0) contractIndex = ~contractIndex;
             //ImpactMonitor.Log("pickedindex=" + contractIndex);
             pickedContract = contracts[contractIndex];
-            ImpactMonitor.Log("picked one "+pickedContract);
+            ImpactMonitor.Log("picked one " + pickedContract);
 
             SetExpiry();
             SetScience(1.5f, pickedContract.body);
             SetDeadlineYears(0.5f, pickedContract.body);
             SetReputation(3, 4, pickedContract.body);
-            SetFunds(20000,80000,10000,pickedContract.body);
+            SetFunds(20000, 80000, 10000, pickedContract.body);
 
             generateParameters();
             ImpactMonitor.Log("Generated parameters");
-            
+
             return true;
         }
 
@@ -146,7 +142,7 @@ namespace kerbal_impact
             {
                 if (body != null) { return body.name + "-" + ImpactMonitor.energyFormat(energy) + "-" + biome + "-" + latitude; }
                 else return asteroid;
-                
+
             }
 
 
@@ -157,10 +153,12 @@ namespace kerbal_impact
                     String bodyName = node.GetValue("BodyName");
                     body = FlightGlobals.Bodies.Find(b => b.name == bodyName);
                 }
-                if (node.HasValue("Energy")) {
+                if (node.HasValue("Energy"))
+                {
                     energy = Double.Parse(node.GetValue("Energy"));
                 }
-                if (node.HasValue("Biome")) {
+                if (node.HasValue("Biome"))
+                {
                     biome = node.GetValue("Biome");
                 }
                 if (node.HasValue("Latitude"))
@@ -170,7 +168,7 @@ namespace kerbal_impact
                 if (node.HasValue("Asteroid"))
                 {
                     asteroid = node.GetValue("Asteroid");
-                    if (body==null)
+                    if (body == null)
                     {
                         //legacy contract without asteroid body specified
                         Vessel ast = FlightGlobals.Vessels.Where(v => v.GetName() == asteroid).Single();
@@ -180,7 +178,7 @@ namespace kerbal_impact
                 if (node.HasValue(ImpactScienceData.DataTypeName))
                 {
                     expectedDataType = (ImpactScienceData.DataTypes)
-                        Enum.Parse(typeof(ImpactScienceData.DataTypes), 
+                        Enum.Parse(typeof(ImpactScienceData.DataTypes),
                         node.GetValue(ImpactScienceData.DataTypeName));
                 }
                 else
@@ -236,14 +234,14 @@ namespace kerbal_impact
         }
     }
 
-    class SeismicContract :  ImpactContract
+    class SeismicContract : ImpactContract
     {
 
         protected override bool Generate()
         {
             return actuallyGenerate();
         }
-        
+
         protected override List<PossibleContract> pickContracts(IEnumerable<CelestialBody> bodies)
         {
             List<PossibleContract> possible = new List<PossibleContract>();
@@ -270,18 +268,19 @@ namespace kerbal_impact
             return possible;
         }
 
-        private double pickKE(double stars, ScienceSubject subject, CelestialBody body) {
+        private double pickKE(double stars, ScienceSubject subject, CelestialBody body)
+        {
             double scienceCap = subject.scienceCap;
-            double minSci = (stars-1)/3*scienceCap;
-            double maxSci = stars/3*scienceCap;
-            double goalScience = minSci + random.NextDouble() *  (maxSci - minSci);
+            double minSci = (stars - 1) / 3 * scienceCap;
+            double maxSci = stars / 3 * scienceCap;
+            double goalScience = minSci + random.NextDouble() * (maxSci - minSci);
             double ke = ImpactMonitor.translateScienceToKE(goalScience, body, subject);
             return ke;
         }
 
         protected override string GetTitle()
         {
-            return Localizer.Format("#autoLOC_SeismicContract_Title", 
+            return Localizer.Format("#autoLOC_SeismicContract_Title",
                 ImpactMonitor.energyFormat(pickedContract.energy), pickedContract.body.GetDisplayName());
         }
 
@@ -337,7 +336,7 @@ namespace kerbal_impact
 
         private static void loadDifficulties()
         {
-            ImpactMonitor.Log("Loading difficulties from "+configFile);
+            ImpactMonitor.Log("Loading difficulties from " + configFile);
             ConfigNode node = ConfigNode.Load(configFile);
 
             if (node.HasValue("use_spectrum_biomes"))
@@ -351,7 +350,7 @@ namespace kerbal_impact
                 foreach (ConfigNode bodyNode in node.GetNodes())
                 {
                     String bodyName = bodyNode.GetValue("body");
-                    CelestialBody body = FlightGlobals.Bodies.Find( b => b.name == bodyName);
+                    CelestialBody body = FlightGlobals.Bodies.Find(b => b.name == bodyName);
                     Dictionary<string, int> difficulties = new Dictionary<string, int>();
                     ConfigNode.ValueList values = bodyNode.values;
                     foreach (ConfigNode.Value s in values)
@@ -378,7 +377,7 @@ namespace kerbal_impact
                 if (contracts.Count() > 0) continue;//only 1 contract of a given type on a given body at once
 
                 contracts = ContractSystem.Instance.GetCurrentContracts<SpectrumContract>()
-                    .Where(contract => contract.prestige == prestige && contract.ContractState==State.Offered);
+                    .Where(contract => contract.prestige == prestige && contract.ContractState == State.Offered);
                 if (contracts.Count() > 0) continue;//only 1 contract a given prestige offered at a time
 
 
@@ -391,7 +390,7 @@ namespace kerbal_impact
                 //ImpactMonitor.Log("Looking for contracs with stars" + stars);
                 if (useBiomes)
                 {
-                    
+
                     IEnumerable<KeyValuePair<String, int>> b = biomes.Where(bd => (int)(bd.Value / 3.4) == stars - 1);
                     foreach (KeyValuePair<String, int> biomeVal in b)
                     {
@@ -402,7 +401,7 @@ namespace kerbal_impact
                 }
                 else
                 {
-                    float lat=0;
+                    float lat = 0;
                     switch (prestige)
                     {
                         case ContractPrestige.Trivial:
@@ -489,7 +488,7 @@ namespace kerbal_impact
             List<PossibleContract> possible = new List<PossibleContract>();
             double probSum = 0;
             ImpactMonitor.Log("Finding asteroids");
-            IEnumerable<Vessel> asteroids= FlightGlobals.Vessels.Where(v => v.vesselType == VesselType.SpaceObject);
+            IEnumerable<Vessel> asteroids = FlightGlobals.Vessels.Where(v => v.vesselType == VesselType.SpaceObject);
             foreach (Vessel asteroid in asteroids)
             {
                 ImpactMonitor.Log("asteroid name = " + asteroid.GetName() + " asteroid discovery=" + asteroid.DiscoveryInfo.Level);
@@ -500,7 +499,7 @@ namespace kerbal_impact
                 contracts = ContractSystem.Instance.GetCurrentContracts<AsteroidSpectrumContract>()
                     .Where(contract => contract.prestige == prestige && contract.ContractState == State.Offered);
                 if (contracts.Count() > 0) continue;//only 1 contract a given prestige offered at a time
-                
+
                 //Does this asteroid match the correct presige?
                 int stars = getAsteroidStars(asteroid);
                 if (stars == starRatings[prestige])
@@ -566,14 +565,14 @@ namespace kerbal_impact
         private void OnVesselDestroy(Vessel vessel)
         {
             ImpactMonitor.Log("In astContract onVesselDestroy");
-            if (vessel.vesselType == VesselType.SpaceObject && pickedContract!=null)
+            if (vessel.vesselType == VesselType.SpaceObject && pickedContract != null)
             {
                 ImpactMonitor.Log("vessel of type asteroid has been destroyed - checking for active contracts");
-                ImpactMonitor.Log("PC="+pickedContract);
+                ImpactMonitor.Log("PC=" + pickedContract);
                 ImpactMonitor.Log("PC.ast=" + pickedContract.asteroid);
                 ImpactMonitor.Log("vesssle=" + vessel);
-                
-                if (pickedContract!=null && pickedContract.asteroid != null && pickedContract.asteroid == vessel.GetName())
+
+                if (pickedContract != null && pickedContract.asteroid != null && pickedContract.asteroid == vessel.GetName())
                 {
                     ImpactMonitor.Log("the asteroid is the one refered to by this contract");
                     this.Cancel();
@@ -590,11 +589,11 @@ namespace kerbal_impact
         protected override void OnAccepted()
         {
             base.OnAccepted();
-            IEnumerable<Vessel> asteroids = 
+            IEnumerable<Vessel> asteroids =
                 FlightGlobals.Vessels.Where(v => v.GetName() == pickedContract.asteroid);
             Vessel asteroid = asteroids.First();
             asteroid.DiscoveryInfo.SetLevel(DiscoveryLevels.StateVectors | DiscoveryLevels.Name | DiscoveryLevels.Presence);
-            
+
         }
 
 
@@ -614,8 +613,9 @@ namespace kerbal_impact
         {
 
         }
-        
-        public ImpactParameter(ImpactContract.PossibleContract contract) {
+
+        public ImpactParameter(ImpactContract.PossibleContract contract)
+        {
             this.contract = contract;
         }
 
@@ -669,11 +669,12 @@ namespace kerbal_impact
                 case ImpactScienceData.DataTypes.Asteroid:
                     ImpactMonitor.Log("Contract astreroid =" + contract.asteroid + " data asteroid ="
                     + data.asteroid + "data.datatype =" + data.datatype + " data asteroid =" + data.asteroid);
-                    passed= contract.asteroid==data.asteroid;
+                    passed = contract.asteroid == data.asteroid;
                     break;
             }
 
-            if (passed) {
+            if (passed)
+            {
                 SetComplete();
                 isComplete = true;
                 ImpactCoordinator.getInstance().bangListeners.Remove(OnBang);
@@ -698,7 +699,8 @@ namespace kerbal_impact
             {
                 return Localizer.Format(asteroidTitle, contract.asteroid);
             }
-            if (contract.biome == null) {
+            if (contract.biome == null)
+            {
                 if (contract.energy > 0)
                 {
                     return Localizer.Format(keTitle, contract.body.GetDisplayName(), ImpactMonitor.energyFormat(contract.energy));
@@ -707,7 +709,7 @@ namespace kerbal_impact
                 {
                     return Localizer.Format(latitudeTitle, contract.body.GetDisplayName(), contract.latitude);
                 }
-            } 
+            }
             else
                 return Localizer.Format(biomeTitle, contract.biome, contract.body.GetDisplayName());
         }
@@ -730,7 +732,7 @@ namespace kerbal_impact
 
         public ScienceReceiptParameter(ImpactContract.PossibleContract contract)
         {
-            
+
             this.contract = contract;
         }
 
@@ -752,10 +754,10 @@ namespace kerbal_impact
             {
                 ImpactCoordinator.getInstance().scienceListeners.Remove(OnScience);
             }
-            ImpactMonitor.Log("science received in "+contract.expectedDataType+" parameter " + randId);
+            ImpactMonitor.Log("science received in " + contract.expectedDataType + " parameter " + randId);
             if (data.datatype != contract.expectedDataType) return;
             ScienceSubject subject = ResearchAndDevelopment.GetSubjectByID(data.subjectID);
-            
+
 
             bool passed = false;
             switch (contract.expectedDataType)
@@ -781,7 +783,7 @@ namespace kerbal_impact
                 case ImpactScienceData.DataTypes.Asteroid:
                     ImpactMonitor.Log("Contract astreroid =" + contract.asteroid + " data asteroid ="
                     + data.asteroid + "data.datatype =" + data.datatype + " data asteroid =" + data.asteroid);
-                    passed= contract.asteroid==data.asteroid;
+                    passed = contract.asteroid == data.asteroid;
                     break;
             }
             if (passed)

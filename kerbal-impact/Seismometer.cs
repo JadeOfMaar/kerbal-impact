@@ -1,16 +1,17 @@
 ﻿using KSP.Localization;
 using KSP.UI.Screens.Flight.Dialogs;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace kerbal_impact
 {
-    class Spectrometer :PartModule, IScienceDataContainer
+    class Seismometer : PartModule, IScienceDataContainer
     {
+        [KSPField(guiActive = true, guiActiveEditor = true, guiName = "Seismometer Impact Status", guiUnits = "", isPersistant = true)]
+        public string statusText = "   No data";
+
+
         protected ImpactScienceData result;
-        //TODO I think this should be a list
 
         protected ExperimentsResultDialog expDialog = null;
 
@@ -20,7 +21,7 @@ namespace kerbal_impact
             {
                 ConfigNode storedDataNode = node.GetNode("ScienceData");
                 ImpactScienceData data = new ImpactScienceData(storedDataNode);
-                result=data;
+                result = data;
             }
         }
 
@@ -31,16 +32,17 @@ namespace kerbal_impact
 
         public static void OnSave(ConfigNode node, ImpactScienceData data)
         {
-            ImpactMonitor.Log("Saving spectrometerr");
+            ImpactMonitor.Log("Saving seismometer");
 
             node.RemoveNodes("ScienceData"); //** Prevent duplicates            
             if (data != null)
             {
                 ConfigNode storedDataNode = node.AddNode("ScienceData");
+                ImpactMonitor.Log("saving data");
                 data.SaveImpact(storedDataNode);
             }
         }
-        
+
 
         internal static void NewResult(ConfigNode node, ImpactScienceData newData)
         {
@@ -48,10 +50,10 @@ namespace kerbal_impact
             if (node.HasNode("ScienceData"))
             {
                 ConfigNode storedDataNode = node.GetNode("ScienceData");
+                ImpactMonitor.Log("loading data");
                 ImpactScienceData data = new ImpactScienceData(storedDataNode);
-                if (newData.dataAmount <= data.dataAmount)
+                if (newData.dataAmount < data.dataAmount || newData.kineticEnergy < data.kineticEnergy)
                 {
-                    ImpactMonitor.Log("Discarding because better data is already stored");
                     return;
                 }
             }
@@ -60,29 +62,35 @@ namespace kerbal_impact
 
         public override void OnUpdate()
         {
-            Events["reviewEvent"].active = result != null;
-
+            if (result != null)
+            {
+                Events["reviewEvent"].active = true;
+                statusText = "   Data recorded";
+            }
         }
 
-		public void ReturnData(ScienceData data)
-		{
-			if (data != null) {
-				if (result == null) {
-					result = data as ImpactScienceData;
-				} else if(data.dataAmount > result.dataAmount) {
-					result = data as ImpactScienceData;
-				}
-			}
+        public void ReturnData(ScienceData data)
+        {
+            if (data != null)
+            {
+                if (result == null)
+                {
+                    result = data as ImpactScienceData;
+                }
+                else if (data.dataAmount > result.dataAmount && (data as ImpactScienceData).kineticEnergy > result.kineticEnergy)
+                {
+                    result = data as ImpactScienceData;
+                }
+            }
 
-			return;
-		}
+            return;
+        }
 
         internal void addExperiment(ImpactScienceData newData)
         {
             //only replace if it is better than any existing results
-            if (result==null || newData.dataAmount > result.dataAmount)
+            if (result == null || (newData.dataAmount > result.dataAmount && newData.kineticEnergy > result.kineticEnergy))
             {
-                ImpactMonitor.Log("Trying to save impact");
                 result = newData;
             }
         }
@@ -99,6 +107,7 @@ namespace kerbal_impact
 
         public void ReviewDataItem(ScienceData sd)
         {
+            ImpactMonitor.Log("Reviewing data from seismomenter");
             ScienceLabSearch labSearch = new ScienceLabSearch(null, sd);
             expDialog = ExperimentsResultDialog.DisplayResult(new ExperimentResultDialogPage(part, sd, 1f, 0f, false, "", true, labSearch, DumpData, KeepData, TransmitData, null));
         }
@@ -116,16 +125,16 @@ namespace kerbal_impact
         public ScienceData[] GetData()
         {
             if (result != null)
-				return new ImpactScienceData[]{result};
-			else
-                return new ImpactScienceData[]{};
+                return new ImpactScienceData[] { result };
+            else
+                return new ImpactScienceData[] { };
         }
 
         public ImpactScienceData[] GetImpactData()
         {
             if (result != null)
-				return new ImpactScienceData[]{result};
-			else
+                return new ImpactScienceData[] { result };
+            else
                 return new ImpactScienceData[] { };
         }
 
@@ -141,9 +150,10 @@ namespace kerbal_impact
         }
         public void TransmitData(ScienceData data)
         {
+            ImpactMonitor.Log("Calling transmit data from seismomenter");
             expDialog = null;
             List<IScienceDataTransmitter> tranList = vessel.FindPartModulesImplementing<IScienceDataTransmitter>();
-            if (tranList.Count > 0 && result!=null)
+            if (tranList.Count > 0 && result != null)
             {
                 List<ScienceData> list2 = new List<ScienceData>();
                 list2.Add(result);
@@ -153,7 +163,7 @@ namespace kerbal_impact
             }
             else ScreenMessages.PostScreenMessage(Localizer.Format("#autoLOC_Screen_NoTrans"), 4f, ScreenMessageStyle.UPPER_LEFT);
         }
-        [KSPEvent(guiActive = true, guiName = "#autoLOC_Spectrometer_Review", active = false)]
+        [KSPEvent(guiActive = true, guiName = "#autoLOC_Seismometer_Review", active = false)]
         public void reviewEvent()
         {
             ReviewData();
